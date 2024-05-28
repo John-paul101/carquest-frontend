@@ -30,13 +30,7 @@ const routes = [
         name: 'shipping-locations',
         component: () => import('@/views/dashboard/shipping/ShippingLocations.vue'),
         meta: { requiresAuth: true, roles: ['admin'], title: 'Shipping Locations' },
-      },
-      {
-        path: 'orders',
-        name: 'admin-orders',
-        component: () => import('@/views/dashboard/orders/AdminOrders.vue'),
-        meta: { requiresAuth: true, roles: ['admin'], title: 'Admin Orders' },
-      },
+      }
     ],
   },
   {
@@ -77,12 +71,6 @@ const routes = [
     meta: { requiresAuth: true, roles: ['buyer'], title: 'Cart' },
   },
   {
-    path: '/cars/:id',
-    name: 'CarDetails',
-    component: () => import('@/views/CarDetails.vue'),
-    meta: { title: 'Car Details' },
-  },
-  {
     path: '/login',
     name: 'buyer-login',
     component: () => import('@/views/buyer/Login.vue'),
@@ -93,18 +81,6 @@ const routes = [
     name: 'register',
     component: () => import('@/views/buyer/Register.vue'),
     meta: { guestOnly: true, title: 'Register' },
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: () => import('@/views/Profile.vue'),
-    meta: { requiresAuth: true, roles: ['buyer'], title: 'Profile' },
-  },
-  {
-    path: '/checkout',
-    name: 'checkout',
-    component: () => import('@/views/Checkout.vue'),
-    meta: { requiresAuth: true, roles: ['buyer'], title: 'Checkout' },
   },
 ]
 
