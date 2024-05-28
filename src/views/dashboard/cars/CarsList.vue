@@ -6,16 +6,16 @@
       <div class="flex flex-wrap justify-between items-center">
         <div class="flex mb-4 sm:mb-0">
           <button
-            @click="selectedLayout = 'horizontal'"
             :class="{ 'bg-blue-500 text-white': selectedLayout === 'horizontal' }"
             class="px-4 py-2 rounded-md mr-2 focus:outline-none"
+            @click="selectedLayout = 'horizontal'"
           >
             Horizontal
           </button>
           <button
-            @click="selectedLayout = 'stacked'"
             :class="{ 'bg-blue-500 text-white': selectedLayout === 'stacked' }"
             class="px-4 py-2 rounded-md focus:outline-none"
+            @click="selectedLayout = 'stacked'"
           >
             Stacked
           </button>
@@ -23,14 +23,14 @@
 
         <div class="flex flex-col sm:flex-row w-full sm:w-auto">
           <input
-            type="text"
             v-model="searchQuery"
+            type="text"
             placeholder="Search by make, model, or year"
             class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2 sm:mb-0 sm:mr-2 w-full sm:w-auto"
           />
           <button
-            @click="addNewCar"
             class="px-4 py-2 bg-green-500 text-white rounded-md focus:outline-none w-full sm:w-auto"
+            @click="addNewCar"
           >
             Add New Car
           </button>
@@ -71,12 +71,20 @@
               </div>
             </div>
             <p class="mt-2">{{ car.description.slice(0, 100) + '...' }}</p>
-            <button
-              @click="delistCar(car.id)"
-              class="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none"
-            >
-              Delist Car
-            </button>
+            <div class="flex mt-4">
+              <button
+                @click="delistCar(car.id)"
+                class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none mr-2"
+              >
+                Delist Car
+              </button>
+              <button
+                @click="editCar(car)"
+                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+              >
+                Edit Car
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -111,12 +119,20 @@
               </div>
             </div>
             <p class="mt-2">{{ car.description.slice(0, 100) + '...' }}</p>
-            <button
-              @click="delistCar(car.id)"
-              class="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none"
-            >
-              Delist Car
-            </button>
+            <div class="flex mt-4">
+              <button
+                @click="delistCar(car.id)"
+                class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none mr-2"
+              >
+                Delist Car
+              </button>
+              <button
+                @click="editCar(car)"
+                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none"
+              >
+                Edit Car
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -125,7 +141,7 @@
 </template>
 
 <script>
-import { userGet, userPost, userDelete } from '@/plugins/http'
+import { userGet, userPost, userDelete, userPatch } from '@/plugins/http'
 import { toast } from 'vue3-toastify'
 import Swal from 'sweetalert2'
 import 'vue3-toastify/dist/index.css'
@@ -192,6 +208,47 @@ export default {
       } catch (error) {
         console.error('Error delisting car:', error)
         toast.error('Failed to delist car')
+      }
+    },
+
+    async editCar(car) {
+      try {
+        const confirmed = await Swal.fire({
+          title: 'Edit Car',
+          html: `
+        <div>
+          <label class="block mb-2">Description:</label>
+          <textarea id="description" class="w-full px-3 py-2 border border-gray-300 mb-4">${car.description}</textarea>
+          <label class="block mb-2">Price:</label>
+          <input type="number" id="price" class="w-full px-3 py-2 border border-gray-300 mb-4" value="${car.price}">
+          <label class="block mb-2">Customs Price:</label>
+          <input type="number" id="customs_price" class="w-full px-3 py-2 border border-gray-300 mb-4" value="${car.customs_price}">
+          <label class="block mb-2">Available Quantity:</label>
+          <input type="number" id="available_quantity" class="w-full px-3 py-2 border border-gray-300 mb-4" value="${car.available_quantity}">
+        </div>
+      `,
+          showCancelButton: true,
+          confirmButtonText: 'Update Car',
+          cancelButtonText: 'Cancel',
+          focusConfirm: false,
+          preConfirm: () => {
+            const description = document.getElementById('description').value
+            const price = document.getElementById('price').value
+            const customs_price = document.getElementById('customs_price').value
+            const available_quantity = document.getElementById('available_quantity').value
+            return { description, price, customs_price, available_quantity }
+          },
+        })
+
+        if (confirmed.isConfirmed) {
+          const formData = confirmed.value
+          await userPatch(`/admin-update-car/${car.id}`, formData)
+          await this.fetchCars()
+          toast.success('Car updated successfully')
+        }
+      } catch (error) {
+        console.error('Error updating car:', error)
+        toast.error('Failed to update car')
       }
     },
     async addNewCar() {

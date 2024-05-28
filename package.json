@@ -10,6 +10,7 @@
     "@capacitor/core": "^6.0.0",
     "@paystack/inline-js": "^2.18.1",
     "apexcharts": "^3.37.1",
+    "leaflet": "^1.9.4",
     "sass": "^1.77.2",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.11.0",

@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/multi-word-component-names -->
-<!-- Cart.vue -->
 <template>
   <div style="min-height: 100vh; background-color: #f8f8f8">
     <!-- Header -->
@@ -107,6 +105,13 @@
                 {{ item.brand }} {{ item.title }}
               </h3>
               <p style="color: #718096; margin-bottom: 1rem">{{ item.description.slice(0, 100) + '...' }}</p>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem">
+                <span style="font-weight: 500">Color:</span>
+                <select v-model="selectedColors[item.id]">
+                  <option value="" disabled>Select Color</option>
+                  <option v-for="color in JSON.parse(item.colors)" :value="color" :key="color">{{ color }}</option>
+                </select>
+              </div>
               <div style="display: flex; justify-content: space-between; align-items: center">
                 <span style="font-weight: 500">Year:</span>
                 <span>{{ item.year }}</span>
@@ -230,6 +235,7 @@ export default {
       shippingMethods: [],
       selectedShippingMethod: '',
       shippingFeeDisplay: '0.00',
+      selectedColors: {}, // New data property to store selected colors
     }
   },
   computed: {
@@ -309,6 +315,13 @@ export default {
         return
       }
 
+      // Validate selected colors for cart items
+      const missingColorItems = this.cartItems.filter((item) => !this.selectedColors[item.id])
+      if (missingColorItems.length > 0) {
+        toast.error('Please select a color for each car in your cart')
+        return
+      }
+
       // Retrieve the buyerData from local storage
       const buyerData = JSON.parse(localStorage.getItem('buyerData'))
 
@@ -341,6 +354,7 @@ export default {
             cars: this.cartItems.map((item) => ({
               id: item.id,
               price: item.price,
+              color: this.selectedColors[item.id], // Include the selected color
             })),
             shipping_location_id: this.selectedShippingLocationId,
             shipping_method_id: this.selectedShippingMethod.id,
